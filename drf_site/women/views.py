@@ -1,31 +1,52 @@
-from django.forms import model_to_dict
-from django.shortcuts import render
-from rest_framework import generics
+from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.viewsets import GenericViewSet, mixins
 
-from .models import Women
+from .models import Women, Category
+from .permissions import IsAdminReadOnly
 from .serializers import WomenSerializer
 
 
 # Create your views here.
+class WomenViewSet(mixins.CreateModelMixin,
+                   mixins.RetrieveModelMixin,
+                   mixins.UpdateModelMixin,
+                   mixins.DestroyModelMixin,
+                   mixins.ListModelMixin,
+                   GenericViewSet):  # ModelViewSet
+    serializer_class = WomenSerializer
+    permission_classes = (IsAdminReadOnly,)  # В кортеж добавляем классы для ограничения доступа
+
+    def get_queryset(self):
+        pk = self.kwargs.get('pk')
+
+        if not pk:
+            return Women.objects.all()
+
+        return Women.objects.filter(pk=pk)
+
+    @action(methods=['get'], detail=True)  # Добавляет маршрут /women/1/category/ , имя берется из названия метода
+    def category(self, request, pk):
+        cats = Category.objects.get(pk=pk)
+        return Response({'cats': cats.name})
+
 # class WomenAPIView(generics.ListAPIView):
 # queryset = Women.objects.all()
 # serializer_class = WomenSerializer
 
-class WomenAPIList(generics.ListCreateAPIView):
-    queryset = Women.objects.all()
-    serializer_class = WomenSerializer
-
-
-class WomenAPIUpdate(generics.UpdateAPIView):
-    queryset = Women.objects.all()
-    serializer_class = WomenSerializer
-
-
-class WomenAPIDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Women.objects.all()
-    serializer_class = WomenSerializer
+# class WomenAPIList(generics.ListCreateAPIView):
+#     queryset = Women.objects.all()
+#     serializer_class = WomenSerializer
+#
+#
+# class WomenAPIUpdate(generics.UpdateAPIView):
+#     queryset = Women.objects.all()
+#     serializer_class = WomenSerializer
+#
+#
+# class WomenAPIDetailView(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Women.objects.all()
+#     serializer_class = WomenSerializer
 
 # class WomenAPIView(APIView):
 #     def get(self, request):

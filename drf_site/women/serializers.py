@@ -7,10 +7,12 @@ from .models import Women
 
 
 class WomenSerializer(serializers.ModelSerializer):
+    user = serializers.HiddenField(
+        default=serializers.CurrentUserDefault())  # Создаем скрытое поле user в котором по умолчанию прописывается пользователь
+
     class Meta:
         model = Women
         fields = '__all__'
-
 
 # class WomenModel:
 #     def __init__(self, title, content):
