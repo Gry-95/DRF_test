@@ -1,4 +1,5 @@
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, mixins
 
@@ -15,7 +16,7 @@ class WomenViewSet(mixins.CreateModelMixin,
                    mixins.ListModelMixin,
                    GenericViewSet):  # ModelViewSet
     serializer_class = WomenSerializer
-    permission_classes = (IsAdminReadOnly,)  # В кортеж добавляем классы для ограничения доступа
+    permission_classes = (IsAuthenticated,)  # В кортеж добавляем классы для ограничения доступа
 
     def get_queryset(self):
         pk = self.kwargs.get('pk')
