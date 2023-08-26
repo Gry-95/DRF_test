@@ -1,4 +1,5 @@
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, mixins
@@ -9,6 +10,12 @@ from .serializers import WomenSerializer
 
 
 # Create your views here.
+class WomenAPIListPagination(PageNumberPagination):
+    page_size = 3
+    page_size_query_param = 'page_size'
+    max_page_size = 10000
+
+
 class WomenViewSet(mixins.CreateModelMixin,
                    mixins.RetrieveModelMixin,
                    mixins.UpdateModelMixin,
@@ -17,6 +24,7 @@ class WomenViewSet(mixins.CreateModelMixin,
                    GenericViewSet):  # ModelViewSet
     serializer_class = WomenSerializer
     permission_classes = (IsAuthenticated,)  # В кортеж добавляем классы для ограничения доступа
+    pagination_class = WomenAPIListPagination
 
     def get_queryset(self):
         pk = self.kwargs.get('pk')
